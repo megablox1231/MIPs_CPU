@@ -1,0 +1,8 @@
+# ================================= #
+# Remove ModelSim project files  #
+# ================================= #
+
+/IM/work/
+/IM/*.mti
+/IM/*.mpf
+/IM/*.bak
