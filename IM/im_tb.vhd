@@ -62,7 +62,7 @@ begin
 			j := j - 8;
 		end loop;
 		j := 31;
-	ir(31 downto 0) <= (OTHERS => '0');
+	--ir(31 downto 0) <= (OTHERS => '0');
 	end loop;
 
 	end process stim_proc;
