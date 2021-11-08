@@ -1,3 +1,8 @@
+-- Group Members: Alex Gomez, Roya Salei, Roberto Toribio, and Harshit Rao
+-- Date: 10/17/2021
+-- Project: Homework 3
+-- Course: CS 3650
+
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
@@ -14,7 +19,7 @@ ENTITY instructionMemory IS
 END instructionMemory;
 
 ARCHITECTURE Behavioral OF instructionMemory IS
-	
+
 	TYPE RAM_32_x_8 IS ARRAY(0 TO 31) OF std_logic_vector(7 DOWNTO 0);
 	SIGNAL IM : RAM_32_x_8 := (
 	"10001101","00101000","00000000","00000000",-- lw t0 0x00000000(t1)
