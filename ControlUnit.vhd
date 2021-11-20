@@ -8,7 +8,7 @@ use IEEE.std_logic_1164.all;
 
 entity ControlUnit is
 port(
-	instruction: in std_logic_vector(31 downto 26);
+	instruction: in std_logic_vector(5 downto 0);
 	clk: in std_logic;
 	reset: in std_logic;
 	regDst: out std_logic;
@@ -16,31 +16,31 @@ port(
 	branch: out std_logic;
 	memRead: out std_logic;
 	memToReg: out std_logic;
-	aluOp: out std_logic_vector(1 downto 0);
+	aluOp: out std_logic_vector(2 downto 0);
 	memWrite: out std_logic;
 	aluSrc: out std_logic;
-	regWrite: out std_logic;
-	signExtend: out std_logic
+	regWrite: out std_logic
+	
 	);
 end ControlUnit;
 
 architecture behavioral of ControlUnit is
 
 begin
-process(reset, instruction)
+process(reset, instruction, clk)
 begin
-	
+	if(rising_edge(clk)) then
 	if(reset = '1') then
-		regDst <= "00";
+		regDst <= '0';
 		jump <= '0';
 		branch <= '0';
 		memRead <= '0';
-		memToReg <= "00";
-		aluOp <= "00";
+		memToReg <= '0';
+		aluOp <= "000";
 		memWrite <= '0';
 		aluSrc <= '0';
 		regWrite <= '0';
-		signExtend <= '1';
+		
 	else
 	case instruction is
 	when "000000" => --R type
@@ -49,109 +49,105 @@ begin
 		branch <= '0';
 		memRead <= '0';
 		memToReg <= '0';
-		aluOp <= "10";
+		aluOp <= "100";
 		memWrite <= '0';
 		aluSrc <= '0';
 		regWrite <= '1';
-		signExtend <= '1';
-	when "001010" => --sliu
-		regDst <= '0';
-		jump <= '0';
-		branch <= '0';
-		memRead <= '0';
-		memToReg <= '1';
-		aluOp <= "10";
-		memWrite <= '0';
-		aluSrc <= '0';
-		regWrite <= '1';
-		signExtend <= '1';
-	when "000010" => --j
-		--regDst <= "00";
-		jump <= '1';
-		branch <= '0';
-		memRead <= '0';
-		--memToReg <= "10";
-		aluOp <= "11";
-		memWrite <= '0';
-		aluSrc <= '0';
-		regWrite <= '0';
-		signExtend <= '1';
-	when "000011" => --jal
-		--regDst <= '1'; -- not sure
-		jump <= '1';
-		branch <= '0';
-		memRead <= '0';
-		--memToReg <= "10";
-		--aluOp <= "00";
-		memWrite <= '0';
-		aluSrc <= '0';
-		regWrite <= '1';
-		signExtend <= '1';
+		
 	when "100011" => --lw from table
 		regDst <= '0';
 		jump <= '0';
 		branch <= '0';
 		memRead <= '1';
 		memToReg <= '1';
-		aluOp <= "00";
+		aluOp <= "010";
 		memWrite <= '0';
 		aluSrc <= '1';
 		regWrite <= '1';
-		signExtend <= '1';
+		
 	when "101011" => --sw from table
-		--regDst <= "00";
 		jump <= '0';
 		branch <= '0';
 		memRead <= '0';
-		--memToReg <= "00";
-		aluOp <= "00";
+		aluOp <= "010";
 		memWrite <= '1';
 		aluSrc <= '1';
 		regWrite <= '0';
-		signExtend <= '1';
+		
 	when "000100" => --beq from table
-		--regDst <= "00";
 		jump <= '0';
 		branch <= '1';
 		memRead <= '0';
-		--memToReg <= "00";
-		aluOp <= "01";
+		aluOp <= "001";
 		memWrite <= '0';
 		aluSrc <= '0';
 		regWrite <= '0';
-		signExtend <= '1';
-	when "001000" => --addi from mipsconverter.com
+		
+	when "000010" => --j
+		jump <= '1';
+		branch <= '0';
+		memRead <= '0';
+		memWrite <= '0';
+		aluSrc <= '0';
+		regWrite <= '0';
+		
+	when "001010" => --slti
+		regDst <= '0';
+		jump <= '0';
+		branch <= '0';
+		memRead <= '0';
+		memToReg <= '1';
+		aluOp <= "011";
+		memWrite <= '0';
+		aluSrc <= '0';
+		regWrite <= '1';
+		
+	when "001101" => --ori 
 		regDst <= '0';
 		jump <= '0';
 		branch <= '0';
 		memRead <= '0';
 		memToReg <= '0';
-		aluOp <= "00";
+		aluOp <= "101";
 		memWrite <= '0';
 		aluSrc <= '1';
 		regWrite <= '1';
-		signExtend <= '1';
-	when others =>
-		--regDst <= "01";
+		
+	when "001000" => --addi
+		regDst <= '0';
 		jump <= '0';
 		branch <= '0';
 		memRead <= '0';
-		--memToReg <= "00";
-		--aluOp <= "00";
+		memToReg <= '0';
+		aluOp <= "110";
+		memWrite <= '0';
+		aluSrc <= '1';
+		regWrite <= '1';
+
+	when "001100" => --andi
+		regDst <= '0';
+		jump <= '0';
+		branch <= '0';
+		memRead <= '0';
+		memToReg <= '0';
+		aluOp <= "111";
+		memWrite <= '0';
+		aluSrc <= '1';
+		regWrite <= '1';
+		
+
+	when others =>
+		jump <= '0';
+		branch <= '0';
+		memRead <= '0';
 		memWrite <= '0';
 		aluSrc <= '0';
 		regWrite <= '0';
-		signExtend <= '1';
+
 end case;
+end if;
 end if;
 end process;
 
 end behavioral;
-
-
-
-
-
-
-
 
