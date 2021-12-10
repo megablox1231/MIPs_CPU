@@ -1,14 +1,15 @@
 -- Group Members: Alex Gomez, Roya Salei, Roberto Toribio, and Harshit Rao
--- Date: 11/15/2021
--- Project: Homework 5
+-- Date: 12/06/2021
+-- Project: Final Project
 -- Course: CS 3650
 
 library IEEE;
 use IEEE.std_logic_1164.all;
 
 entity ControlUnit is
+generic(delay :time:=1 ns);
 port(
-	instruction: in std_logic_vector(5 downto 0);
+	opCode: in std_logic_vector(5 downto 0);
 	clk: in std_logic;
 	reset: in std_logic;
 	regDst: out std_logic;
@@ -20,134 +21,38 @@ port(
 	memWrite: out std_logic;
 	aluSrc: out std_logic;
 	regWrite: out std_logic
-	
+		
 	);
 end ControlUnit;
 
 architecture behavioral of ControlUnit is
+	signal temp : std_logic_vector(10 downto 0);
 
 begin
-process(reset, instruction, clk)
-begin
-	if(rising_edge(clk)) then
-	if(reset = '1') then
-		regDst <= '0';
-		jump <= '0';
-		branch <= '0';
-		memRead <= '0';
-		memToReg <= '0';
-		aluOp <= "000";
-		memWrite <= '0';
-		aluSrc <= '0';
-		regWrite <= '0';
-		
-	else
-	case instruction is
-	when "000000" => --R type
-		regDst <= '1';
-		jump <= '0';
-		branch <= '0';
-		memRead <= '0';
-		memToReg <= '0';
-		aluOp <= "100";
-		memWrite <= '0';
-		aluSrc <= '0';
-		regWrite <= '1';
-		
-	when "100011" => --lw from table
-		regDst <= '0';
-		jump <= '0';
-		branch <= '0';
-		memRead <= '1';
-		memToReg <= '1';
-		aluOp <= "010";
-		memWrite <= '0';
-		aluSrc <= '1';
-		regWrite <= '1';
-		
-	when "101011" => --sw from table
-		jump <= '0';
-		branch <= '0';
-		memRead <= '0';
-		aluOp <= "010";
-		memWrite <= '1';
-		aluSrc <= '1';
-		regWrite <= '0';
-		
-	when "000100" => --beq from table
-		jump <= '0';
-		branch <= '1';
-		memRead <= '0';
-		aluOp <= "001";
-		memWrite <= '0';
-		aluSrc <= '0';
-		regWrite <= '0';
-		
-	when "000010" => --j
-		jump <= '1';
-		branch <= '0';
-		memRead <= '0';
-		memWrite <= '0';
-		aluSrc <= '0';
-		regWrite <= '0';
-		
-	when "001010" => --slti
-		regDst <= '0';
-		jump <= '0';
-		branch <= '0';
-		memRead <= '0';
-		memToReg <= '1';
-		aluOp <= "011";
-		memWrite <= '0';
-		aluSrc <= '0';
-		regWrite <= '1';
-		
-	when "001101" => --ori 
-		regDst <= '0';
-		jump <= '0';
-		branch <= '0';
-		memRead <= '0';
-		memToReg <= '0';
-		aluOp <= "101";
-		memWrite <= '0';
-		aluSrc <= '1';
-		regWrite <= '1';
-		
-	when "001000" => --addi
-		regDst <= '0';
-		jump <= '0';
-		branch <= '0';
-		memRead <= '0';
-		memToReg <= '0';
-		aluOp <= "110";
-		memWrite <= '0';
-		aluSrc <= '1';
-		regWrite <= '1';
+	temp <= "01001000100" when (opCode="000000")--R format		
+	else    "00111100010" when (opCode="100011")--lw		
+	else    "00100010010" when (opCode="101011")--sw		
+	else    "00000001001" when (opCode="000100")--beq		
+	else    "00000001000" when (opCode="000101")--bne
+	else    "10000000000" when (opCode="000010")--j				
+	else    "00011000011" when (opCode="001010")--slti			
+	else    "00101000101" when (opCode="001101")--ori
+	else    "00101000110" when (opCode="001000")--addi	
+	else    "00101000111" when (opCode="001100");--andi				
+	
+	
+	jump		<= temp(10) after delay;
+	regDst		<= temp(9) after delay;
+	alusrc		<= temp(8) after delay;
+	memtoreg	<= temp(7) after delay;
+	regwrite	<= temp(6) after delay;
+	memread		<= temp(5) after delay;
+	memwrite	<= temp(4) after delay;
+	branch		<= temp(3) after delay;
+	aluop		<= temp(2 downto 0) after delay;
 
-	when "001100" => --andi
-		regDst <= '0';
-		jump <= '0';
-		branch <= '0';
-		memRead <= '0';
-		memToReg <= '0';
-		aluOp <= "111";
-		memWrite <= '0';
-		aluSrc <= '1';
-		regWrite <= '1';
 		
 
-	when others =>
-		jump <= '0';
-		branch <= '0';
-		memRead <= '0';
-		memWrite <= '0';
-		aluSrc <= '0';
-		regWrite <= '0';
 
-end case;
-end if;
-end if;
-end process;
 
 end behavioral;
-
